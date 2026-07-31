@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>6000+ 活动查询</title>
+
+ <!-- PWA Meta -->
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="default">
+ <meta name="apple-mobile-web-app-title" content="活动查询">
+ <link rel="apple-touch-icon" href="icon-192.png">
+ <link rel="manifest" href="manifest.json">
+ <meta name="theme-color" content="#f5f5f7">
+
+ <style>
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+ }
+ body {
+ background-color: #f5f5f7;
+ padding: 20px;
+ min-height: 100vh;
+ }
+ .container {
+ max-width: 600px;
+ margin: 0 auto;
+ }
+ h1 {
+ color: #1d1d1f;
+ font-size: 28px;
+ font-weight: 600;
+ text-align: center;
+ margin-bottom: 30px;
+ }
+ .form-group {
+ margin-bottom: 24px;
+ }
+ label {
+ display: block;
+ color: #1d1d1f;
+ font-size: 16px;
+ font-weight: 500;
+ margin-bottom: 8px;
+ }
+ select {
+ width: 100%;
+ padding: 14px 16px;
+ border: 1px solid #d2d2d7;
+ border-radius: 12px;
+ background-color: #fff;
+ font-size: 16px;
+ color: #1d1d1f;
+ appearance: none;
+ -webkit-appearance: none;
+ background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231d1d1f' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+ background-repeat: no-repeat;
+ background-position: right 16px center;
+ background-size: 20px;
+ cursor: pointer;
+ transition: border-color 0.2s ease;
+ }
+ select:disabled {
+ background-color: #f5f5f7;
+ color: #86868b;
+ cursor: not-allowed;
+ }
+ select:focus {
+ outline: none;
+ border-color: #0071e3;
+ }
+ .result-card {
+ background-color: #fff;
+ border-radius: 16px;
+ padding: 24px;
+ margin-top: 30px;
+ box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+ display: none;
+ }
+ .result-card.show {
+ display: block;
+ }
+ .result-item {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ padding: 12px 0;
+ border-bottom: 1px solid #f2f2f7;
+ }
+ .result-item:last-child {
+ border-bottom: none;
+ }
+ .result-label {
+ color: #86868b;
+ font-size: 14px;
+ }
+ .result-value {
+ color: #1d1d1f;
+ font-size: 16px;
+ font-weight: 500;
+ }
+ .result-value.highlight {
+ color: #0071e3;
+ font-size: 18px;
+ font-weight: 600;
+ }
+ .result-value.discount {
+ color: #ff3b30;
+ font-weight: 600;
+ }
+ .section-title {
+ font-size: 15px;
+ font-weight: 600;
+ color: #1d1d1f;
+ padding: 8px 0 4px;
+ margin-top: 8px;
+ border-top: 1px dashed #e5e5ea;
+ }
+
+ /* 安装提示条 */
+ .install-banner {
+ display: none;
+ background: #0071e3;
+ color: #fff;
+ padding: 14px 20px;
+ border-radius: 12px;
+ margin-bottom: 20px;
+ text-align: center;
+ cursor: pointer;
+ font-size: 15px;
+ font-weight: 500;
+ transition: background 0.2s;
+ }
+ .install-banner:hover {
+ background: #0060c0;
+ }
+ .install-banner.show {
+ display: block;
+ }
+
+ footer {
+ text-align: center;
+ padding: 24px 20px;
+ color: #86868b;
+ font-size: 13px;
+ }
+ </style>
+</head>
+<body>
+ <div class="container">
+ <h1>📱 6000+ 活动查询</h1>
+
+ <!-- 安装提示 -->
+ <div class="install-banner" id="installBanner">
+ ⬇️ 点击此处安装到桌面，像 App 一样使用
+ </div>
+
+ <div class="form-group">
+ <label for="selModel">手机型号</label>
+ <select id="selModel">
+ <option value="">手机型号</option>
+ <option value="apple17_512">苹果 17 512G</option>
+ <option value="appleAir_512">苹果 Air 512G</option>
+ <option value="appleAir_1TB">苹果 Air 1TB</option>
+ <option value="apple17Pro_256">苹果 17 Pro 256G</option>
+ <option value="apple17Pro_512">苹果 17 Pro 512G</option>
+ <option value="apple17Pro_1TB">苹果 17 Pro 1TB</option>
+ <option value="apple17ProMax_256">苹果 17 Pro Max 256G</option>
+ <option value="apple17ProMax_512">苹果 17 Pro Max 512G</option>
+ <option value="apple17ProMax_1TB">苹果 17 Pro Max 1TB</option>
+ <option value="apple17ProMax_2TB">苹果 17 Pro Max 2TB</option>
+ </select>
+ </div>
+ <div class="form-group">
+ <label for="selPackage">套餐情况</label>
+ <select id="selPackage" disabled>
+ <option value="">请先选择机型</option>
+ <option value="pkgACS">45W 充电头 +199 钢化膜 +199 手机壳+ACS</option>
+ <option value="pkgACS_299">45W 充电头 +199 钢化膜 +299 手机壳+ACS</option>
+ <option value="pkgC50i_199">45W 充电头 +199 钢化膜 +199 手机壳+C50i</option>
+ <option value="pkgC50i_299">45W 充电头 +199 钢化膜 +299 手机壳+C50i</option>
+ </select>
+ </div>
+ <div class="result-card" id="result-card">
+ <div class="result-item">
+ <span class="result-label">手机型号</span>
+ <span class="result-value highlight" id="r_model">-</span>
+ </div>
+ <div class="section-title">💰 价格详情</div>
+ <div class="result-item">
+ <span class="result-label">总支付</span>
+ <span class="result-value" id="r_money">-</span>
+ </div>
+ <div class="result-item">
+ <span class="result-label">平台支付</span>
+ <span class="result-value" id="r_platform">-</span>
+ </div>
+ <div class="result-item">
+ <span class="result-label">POS 支付</span>
+ <span class="result-value" id="r_pos">-</span>
+ </div>
+ <div class="section-title">🎁 博远录单</div>
+ <div class="result-item">
+ <span class="result-label">配件折扣</span>
+ <span class="result-value discount" id="r_discount">-</span>
+ </div>
+ <div class="result-item">
+ <span class="result-label">对应钢化膜单价</span>
+ <span class="result-value highlight" id="r_glass">-</span>
+ </div>
+ </div>
+ </div>
+
+ <footer>
+ Copyright © 2026 Dennis Luohe lnc. | 可安装到桌面
+ </footer>
+
+ <script>
+ // ===== PWA 安装逻辑 =====
+ let deferredPrompt;
+ const installBanner = document.getElementById('installBanner');
+
+ window.addEventListener('beforeinstallprompt', (e) => {
+ e.preventDefault();
+ deferredPrompt = e;
+ installBanner.classList.add('show');
+ });
+
+ installBanner.addEventListener('click', async () => {
+ if (!deferredPrompt) return;
+ deferredPrompt.prompt();
+ const result = await deferredPrompt.userChoice;
+ if (result.outcome === 'accepted') {
+ installBanner.classList.remove('show');
+ }
+ deferredPrompt = null;
+ });
+
+ window.addEventListener('appinstalled', () => {
+ installBanner.classList.remove('show');
+ });
+
+ // 注册 Service Worker
+ if ('serviceWorker' in navigator) {
+ navigator.serviceWorker.register('sw.js').catch(() => {});
+ }
+
+ // ===== 业务逻辑 =====
+ const rawData = {
+ "apple17_512":{
+ name:"苹果 17 512G",
+ money:7999,
+ platform:7199.1,
+ pos:799.9,
+ pkgACS:{discount:7.3,glass:145.09},
+ pkgC50i_199:{discount:7.72,glass:153.73},
+ pkgC50i_299:{discount:7.04,glass:140.24},
+ pkgACS_299:{discount:6.68,glass:133.91}
+ },
+ "appleAir_512":{
+ name:"苹果 Air 512G",
+ money:7999,
+ platform:7199.1,
+ pos:799.9,
+ pkgACS:{discount:7.3,glass:145.09},
+ pkgC50i_199:{discount:7.72,glass:153.73},
+ pkgC50i_299:{discount:7.04,glass:140.24},
+ pkgACS_299:{discount:6.68,glass:133.91}
+ },
+ "apple17Pro_256":{
+ name:"苹果 17 Pro 256G",
+ money:8399,
+ platform:7559.1,
+ pos:839.9,
+ pkgACS:{discount:7.66,glass:152.81},
+ pkgC50i_199:{discount:8.10,glass:161.93},
+ pkgC50i_299:{discount:7.39,glass:147.46},
+ pkgACS_299:{discount:7.02,glass:140.00}
+ },
+ "apple17ProMax_256":{
+ name:"苹果 17 Pro Max 256G",
+ money:9449,
+ platform:8504.1,
+ pos:944.9,
+ pkgACS:{discount:8.62,glass:171.68},
+ pkgC50i_199:{discount:9.12,glass:181.55},
+ pkgC50i_299:{discount:8.31,glass:166.25},
+ pkgACS_299:{discount:7.90,glass:157.27}
+ },
+ "appleAir_1TB":{
+ name:"苹果 Air 1TB",
+ money:9999,
+ platform:8999.1,
+ pos:999.9,
+ pkgACS:{discount:9.12,glass:181.83},
+ pkgC50i_199:{discount:9.65,glass:192.18},
+ pkgC50i_299:{discount:8.80,glass:175.34},
+ pkgACS_299:{discount:8.36,glass:166.42}
+ },
+ "apple17Pro_512":{
+ name:"苹果 17 Pro 512G",
+ money:10499,
+ platform:9499,
+ pos:1000,
+ pkgACS:{discount:9.12,glass:181.93},
+ pkgC50i_199:{discount:9.65,glass:192.28},
+ pkgC50i_299:{discount:8.80,glass:175.44},
+ pkgACS_299:{discount:8.36,glass:166.52}
+ },
+ "apple17ProMax_512":{
+ name:"苹果 17 Pro Max 512G",
+ money:11499,
+ platform:10499,
+ pos:1000,
+ pkgACS:{discount:9.12,glass:181.93},
+ pkgC50i_199:{discount:9.65,glass:192.28},
+ pkgC50i_299:{discount:8.80,glass:175.44},
+ pkgACS_299:{discount:8.36,glass:166.52}
+ },
+ "apple17Pro_1TB":{
+ name:"苹果 17 Pro 1TB",
+ money:12499,
+ platform:11499,
+ pos:1000,
+ pkgACS:{discount:9.12,glass:181.93},
+ pkgC50i_199:{discount:9.65,glass:192.28},
+ pkgC50i_299:{discount:8.80,glass:175.44},
+ pkgACS_299:{discount:8.36,glass:166.52}
+ },
+ "apple17ProMax_1TB":{
+ name:"苹果 17 Pro Max 1TB",
+ money:13499,
+ platform:12499,
+ pos:1000,
+ pkgACS:{discount:9.12,glass:181.93},
+ pkgC50i_199:{discount:9.65,glass:192.28},
+ pkgC50i_299:{discount:8.80,glass:175.44},
+ pkgACS_299:{discount:8.36,glass:166.52}
+ },
+ "apple17ProMax_2TB":{
+ name:"苹果 17 Pro Max 2TB",
+ money:17499,
+ platform:16499,
+ pos:1000,
+ pkgACS:{discount:9.12,glass:181.93},
+ pkgC50i_199:{discount:9.65,glass:192.28},
+ pkgC50i_299:{discount:8.80,glass:175.44},
+ pkgACS_299:{discount:8.36,glass:166.52}
+ }
+ };
+
+ const selModel = document.getElementById('selModel');
+ const selPackage = document.getElementById('selPackage');
+ const resultCard = document.getElementById('result-card');
+
+ selModel.addEventListener('change', () => {
+ const mid = selModel.value;
+ resultCard.classList.remove('show');
+ selPackage.value = "";
+ if (mid) {
+ selPackage.disabled = false;
+ } else {
+ selPackage.disabled = true;
+ }
+ });
+
+ selPackage.addEventListener('change', () => {
+ const mid = selModel.value;
+ const pid = selPackage.value;
+ if (!mid || !pid) return;
+ const data = rawData[mid];
+ const pack = data[pid];
+ document.getElementById('r_model').innerText = data.name;
+ document.getElementById('r_money').innerText = '¥' + data.money.toLocaleString();
+ document.getElementById('r_platform').innerText = '¥' + data.platform;
+ document.getElementById('r_pos').innerText = '¥' + data.pos;
+ document.getElementById('r_discount').innerText = pack.discount;
+ document.getElementById('r_glass').innerText = '¥' + pack.glass;
+ resultCard.classList.add('show');
+ });
+ </script>
+</body>
+</html>
