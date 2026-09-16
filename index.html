@@ -3,7 +3,6 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
- <title>配件套餐活动查询</title>
  <!-- PWA Meta -->
  <meta name="apple-mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -117,6 +116,12 @@
  margin-top: 8px;
  border-top: 1px dashed #e5e5ea;
  }
+ .package-goods{
+    color:#1d1d1f;
+    font-size:15px;
+    margin:8px 0 16px;
+    line-height:1.6;
+ }
  /* 安装提示条 */
  .install-banner {
  display: none;
@@ -158,7 +163,7 @@
  <option value="">请选择设备品类</option>
  <option value="iphone">iPhone套餐</option>
  <option value="ipad">iPad套餐</option>
- <option value="watch">Apple Watch套餐</option>
+ <option value="watch">Watch套餐</option>
  <option value="mac">Mac套餐</option>
  </select>
  </div>
@@ -169,10 +174,7 @@
  </select>
  </div>
  <div class="result-card" id="result-card">
- <div class="result-item">
- <span class="result-label">设备品类</span>
- <span class="result-value highlight" id="r_device">-</span>
- </div>
+ <div class="package-goods" id="r_goods"></div>
  <div class="section-title">💰 套餐基础信息</div>
  <div class="result-item">
  <span class="result-label">零售总价</span>
@@ -221,34 +223,82 @@
  navigator.serviceWorker.register('sw.js').catch(() => {});
  }
 
- // ===== 业务数据（前面计算好的套餐数据，膜为调节项，按单品零售价求和）=====
+ // ===== 业务数据，已更新价格：镜头膜149，保护壳299，电脑包299；iPhone套餐二合并移动电源/ACS二选一 =====
  const rawData = {
   "iphone":{
     name:"iPhone套餐",
     packages:{
-      pkg1:{title:"套餐1（17全系列、18Pro）", retailTotal:946, activityPrice:598, discount:6.4, filmPrice:87.92},
-      pkg2:{title:"套餐2（全系列）", retailTotal:1345, activityPrice:998, discount:7.4, filmPrice:112.96},
-      pkgACS:{title:"ACS套餐（全系列）", retailTotal:1345, activityPrice:998, discount:7.4, filmPrice:112.96}
+      pkg1:{
+        title:"保护壳+屏幕膜+充电器+镜头膜",
+        goods:"保护壳299＋屏幕膜199＋45W充电器299＋镜头膜149，零售总价946",
+        retailTotal:946,
+        activityPrice:598,
+        discount:6.4,
+        filmPrice:87.92
+      },
+      pkg2:{
+        title:"保护壳+屏幕膜+充电器+镜头膜+移动电源/ACS（二选一）",
+        goods:"保护壳299＋屏幕膜199＋45W充电器299＋镜头膜149＋移动电源/ACS399，零售总价1345",
+        retailTotal:1345,
+        activityPrice:998,
+        discount:7.4,
+        filmPrice:112.96
+      }
     }
   },
   "ipad":{
     name:"iPad套餐",
     packages:{
-      pkg1:{title:"iPad套餐1（屏幕膜+保护壳）", retailTotal:498, activityPrice:299, discount:6.0, filmPrice:119.60},
-      pkg2:{title:"iPad套餐2（屏幕膜+保护壳+触控笔）", retailTotal:797, activityPrice:499, discount:6.3, filmPrice:122.26}
+      pkg1:{
+        title:"屏幕膜+保护壳",
+        goods:"屏幕膜199＋保护壳299，零售总价498",
+        retailTotal:498,
+        activityPrice:299,
+        discount:6.0,
+        filmPrice:119.60
+      },
+      pkg2:{
+        title:"屏幕膜+保护壳+触控笔",
+        goods:"屏幕膜199＋保护壳299＋触控笔299，零售总价797",
+        retailTotal:797,
+        activityPrice:499,
+        discount:6.3,
+        filmPrice:122.26
+      }
     }
   },
   "watch":{
-    name:"Apple Watch套餐",
+    name:"Watch套餐",
     packages:{
-      pkg1:{title:"Watch套餐（屏幕膜+表带）", retailTotal:327, activityPrice:199, discount:6.1, filmPrice:84.32}
+      pkg1:{
+        title:"屏幕膜+表带",
+        goods:"屏幕膜139＋表带188，零售总价327",
+        retailTotal:327,
+        activityPrice:199,
+        discount:6.1,
+        filmPrice:84.32
+      }
     }
   },
   "mac":{
     name:"Mac套餐",
     packages:{
-      pkg1:{title:"Mac套餐1（五合一膜+键盘膜+电脑包）", retailTotal:756, activityPrice:499, discount:6.6, filmPrice:197.38},
-      pkg2:{title:"Mac套餐2（五合一膜+键盘膜+电脑包+扩展坞）", retailTotal:1055, activityPrice:699, discount:6.6, filmPrice:200.04}
+      pkg1:{
+        title:"五合一膜+键盘膜+电脑包",
+        goods:"五合一膜199＋键盘膜99＋电脑包299，零售总价597",
+        retailTotal:597,
+        activityPrice:499,
+        discount:6.6,
+        filmPrice:197.38
+      },
+      pkg2:{
+        title:"五合一膜+键盘膜+电脑包+扩展坞",
+        goods:"五合一膜199＋键盘膜99＋电脑包299＋扩展坞299，零售总价896",
+        retailTotal:896,
+        activityPrice:699,
+        discount:6.6,
+        filmPrice:200.04
+      }
     }
   }
  };
@@ -256,19 +306,20 @@
  const selDevice = document.getElementById('selDevice');
  const selPackage = document.getElementById('selPackage');
  const resultCard = document.getElementById('result-card');
+ const r_goods = document.getElementById('r_goods');
 
  selDevice.addEventListener('change', () => {
   const devId = selDevice.value;
   resultCard.classList.remove('show');
   selPackage.innerHTML = '<option value="">请先选择设备品类</option>';
   selPackage.value = "";
+  r_goods.innerText = "";
   if (!devId) {
     selPackage.disabled = true;
     return;
   }
-  selPackage.disabled = false;
+  selPackage.removeAttribute('disabled');
   const devData = rawData[devId];
-  // 填充套餐下拉
   Object.entries(devData.packages).forEach(([pkgKey, pkgInfo])=>{
     const opt = document.createElement('option');
     opt.value = pkgKey;
@@ -284,7 +335,7 @@
   const devData = rawData[devId];
   const pack = devData.packages[pkgId];
 
-  document.getElementById('r_device').innerText = devData.name;
+  r_goods.innerText = pack.goods;
   document.getElementById('r_retailTotal').innerText = '¥' + pack.retailTotal;
   document.getElementById('r_activityPrice').innerText = '¥' + pack.activityPrice;
   document.getElementById('r_discount').innerText = pack.discount;
@@ -295,3 +346,4 @@
  </script>
 </body>
 </html>
+<!-- （注：内容由AI生成） -->
